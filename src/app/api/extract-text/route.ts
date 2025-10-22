@@ -25,12 +25,7 @@ interface ExtractionResult {
 
 async function extractPDF(buffer: Buffer): Promise<ExtractionResult> {
   // Dynamic import to avoid build-time issues
-  const pdfParse = (await import("pdf-parse")) as unknown as (buffer: Buffer) => Promise<{
-    numpages: number;
-    text: string;
-    info: unknown;
-    metadata: unknown;
-  }>;
+  const pdfParse = (await import("pdf-parse")).default;
   
   const data = await pdfParse(buffer);
 
