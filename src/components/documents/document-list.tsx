@@ -1,14 +1,16 @@
 "use client";
 
-import { useMutation } from "convex/react";
+import { useState } from "react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Trash2, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { FileText, Download, Trash2, Clock, CheckCircle, AlertCircle, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { de } from "date-fns/locale";
 import { Id } from "../../../convex/_generated/dataModel";
+import { PdfViewerModal } from "./pdf-viewer-modal";
 
 interface Document {
   _id: Id<"documents">;
@@ -26,7 +28,20 @@ interface DocumentListProps {
 }
 
 export function DocumentList({ documents, viewMode }: DocumentListProps) {
+  const [viewingDoc, setViewingDoc] = useState<Document | null>(null);
   const removeDocument = useMutation(api.documents.remove);
+  const downloadUrl = useQuery(
+    api.documents.getDownloadUrl,
+    viewingDoc ? { storageId: viewingDoc.storageId } : "skip"
+  );
+
+  const handleView = (doc: Document) => {
+    if (doc.fileType === "pdf") {
+      setViewingDoc(doc);
+    } else {
+      toast.info("Vorschau nur für PDF-Dateien verfügbar");
+    }
+  };
 
   const handleDownload = async (doc: Document) => {
     try {
@@ -80,8 +95,9 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
 
   if (viewMode === "grid") {
     return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {documents.map((doc) => (
+      <>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {documents.map((doc) => (
           <Card key={doc._id} className="flex flex-col">
             <CardContent className="flex-1 pt-6">
               <div className="flex items-start justify-between">
@@ -112,11 +128,19 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
                 variant="outline"
                 size="sm"
                 className="flex-1"
+                onClick={() => handleView(doc)}
+                disabled={doc.status !== "ready"}
+              >
+                <Eye className="mr-2 h-4 w-4" />
+                Ansehen
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handleDownload(doc)}
                 disabled={doc.status !== "ready"}
               >
-                <Download className="mr-2 h-4 w-4" />
-                Download
+                <Download className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
@@ -129,6 +153,16 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
           </Card>
         ))}
       </div>
+
+      {viewingDoc && downloadUrl && (
+        <PdfViewerModal
+          isOpen={!!viewingDoc}
+          onClose={() => setViewingDoc(null)}
+          fileUrl={downloadUrl}
+          fileName={viewingDoc.title}
+        />
+      )}
+    </>
     );
   }
 
@@ -159,6 +193,14 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
               <Button
                 variant="outline"
                 size="sm"
+                onClick={() => handleView(doc)}
+                disabled={doc.status !== "ready"}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => handleDownload(doc)}
                 disabled={doc.status !== "ready"}
               >
@@ -175,6 +217,15 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
           </CardContent>
         </Card>
       ))}
+
+      {viewingDoc && downloadUrl && (
+        <PdfViewerModal
+          isOpen={!!viewingDoc}
+          onClose={() => setViewingDoc(null)}
+          fileUrl={downloadUrl}
+          fileName={viewingDoc.title}
+        />
+      )}
     </div>
   );
 }

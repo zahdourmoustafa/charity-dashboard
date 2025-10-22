@@ -5,15 +5,24 @@ import { rag } from "./rag";
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 
-const SYSTEM_PROMPT = `Du bist ein Assistent für Qualitätsmanagement in einer Zahnarztpraxis (LZK Baden-Württemberg).
+const SYSTEM_PROMPT = `Du bist ein Qualitätsmanagement-Assistent für Zahnarztpraxen (LZK Baden-Württemberg).
 
 WICHTIGE REGELN:
 1. Beantworte Fragen NUR anhand der bereitgestellten Dokumente
-2. Wenn die Information nicht in den Dokumenten steht, sage: "Diese Information finde ich nicht in den verfügbaren Dokumenten."
-3. Gib IMMER die Quelle an (Dokumentname)
-4. Halte Antworten präzise und praxisnah (3-7 Sätze)
-5. Verwende einfache, klare Sprache
-6. Bei Unsicherheit: Empfehle, das Originaldokument zu prüfen
+2. Wenn unter "Verfügbare Dokumente" ein passendes Dokument aufgelistet ist, sage: "Das Dokument '[Name]' ist in der Dokumentenliste verfügbar."
+3. Wenn Dokumentinhalte vorhanden sind, beantworte die Frage basierend auf dem Inhalt
+4. Wenn keine relevanten Dokumente gefunden wurden, sage: "Diese Information finde ich nicht in den verfügbaren Dokumenten. Bitte wende dich an die Praxisleitung."
+5. Gib IMMER die Quelle an: [Dokumentname, Seite X]
+6. Halte Antworten präzise (3-7 Sätze)
+7. Verwende einfache, klare Sprache für Praxispersonal
+8. Verwende Aufzählungen (•) für Schritt-für-Schritt-Anleitungen
+
+ANTWORTFORMAT:
+[Klare Antwort auf Deutsch]
+
+[Schritte falls zutreffend]
+
+📄 Quelle: [Dokumentname, Seite X]
 
 KONTEXT:
 {context}
@@ -25,7 +34,12 @@ export const chat = action({
     message: v.string(),
   },
   handler: async (ctx, args) => {
-    // Step 1: Search documents using RAG
+    // Step 1: Search document titles
+    const titleResults = await ctx.runQuery(api.documents.searchTitles, {
+      query: args.message,
+    });
+
+    // Step 2: Search documents using RAG
     const searchResults = await rag.search(ctx, {
       namespace: "practice",
       query: args.message,
@@ -33,12 +47,24 @@ export const chat = action({
       vectorScoreThreshold: 0.5,
     });
 
-    // Step 2: Build context from search results
+    // Step 3: Build context from search results
     let context = "";
     const sources: Array<{ title: string; entryId: string }> = [];
 
+    // Add available documents from title search
+    if (titleResults.length > 0) {
+      context += "--- Verfügbare Dokumente ---\n";
+      titleResults.forEach((doc) => {
+        context += `• ${doc.title} (${doc.fileType.toUpperCase()})\n`;
+      });
+      context += "\n";
+    }
+
+    // Add document content from RAG search
     if (searchResults.results.length === 0) {
-      context = "Keine relevanten Dokumente gefunden.";
+      if (titleResults.length === 0) {
+        context += "Keine relevanten Dokumente gefunden.";
+      }
     } else {
       // Group results by entry (document)
       const entriesMap = new Map<string, { title: string; chunks: string[] }>();
@@ -72,7 +98,11 @@ export const chat = action({
       entriesMap.forEach((data) => {
         contextParts.push(`\n--- ${data.title} ---\n${data.chunks.join("\n\n")}`);
       });
-      context = contextParts.join("\n\n");
+      
+      if (titleResults.length > 0) {
+        context += "--- Dokumentinhalte ---\n";
+      }
+      context += contextParts.join("\n\n");
     }
 
     // Step 3: Generate AI response

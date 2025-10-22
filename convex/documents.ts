@@ -5,6 +5,25 @@ import { rag } from "./rag";
 import { extractText } from "./lib/textExtraction";
 import { chunkText } from "./lib/chunking";
 
+// Search document titles (for AI fallback)
+export const searchTitles = query({
+  args: {
+    query: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const results = await ctx.db
+      .query("documents")
+      .withSearchIndex("search_title", (q) => q.search("title", args.query))
+      .filter((q) => q.eq(q.field("status"), "ready"))
+      .take(5);
+    
+    return results.map((doc) => ({
+      title: doc.title,
+      fileType: doc.fileType,
+    }));
+  },
+});
+
 // Generate upload URL for client
 export const generateUploadUrl = mutation({
   args: {},
