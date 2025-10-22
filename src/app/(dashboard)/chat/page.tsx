@@ -7,19 +7,28 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { ChatInput } from "@/components/chat/chat-input";
+import { SourcePreviewSidebar } from "@/components/chat/source-preview-sidebar";
 import { MessageSquare, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
+interface Source {
+  title: string;
+  entryId: string;
+  chunkText: string;
+  pageNumber?: number;
+}
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  sources?: Array<{ title: string; entryId: string }>;
+  sources?: Source[];
 }
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedSource, setSelectedSource] = useState<Source | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const chatAction = useAction(api.chat.chat);
@@ -46,12 +55,17 @@ export default function ChatPage() {
       // Call chat action
       const response = await chatAction({ message });
 
+      // Filter sources to only include ones mentioned in the response
+      const mentionedSources = response.sources.filter((source) => 
+        response.response.toLowerCase().includes(source.title.toLowerCase())
+      );
+
       // Add assistant response
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: response.response,
-        sources: response.sources,
+        sources: mentionedSources.length > 0 ? mentionedSources : response.sources.slice(0, 2),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -120,6 +134,7 @@ export default function ChatPage() {
                     role={message.role}
                     content={message.content}
                     sources={message.sources}
+                    onSourceClick={setSelectedSource}
                   />
                 ))}
                 <div ref={messagesEndRef} />
@@ -133,6 +148,13 @@ export default function ChatPage() {
           </div>
         </div>
       </Card>
+
+      {/* Source Preview Sidebar */}
+      <SourcePreviewSidebar
+        isOpen={!!selectedSource}
+        onClose={() => setSelectedSource(null)}
+        source={selectedSource}
+      />
     </div>
   );
 }

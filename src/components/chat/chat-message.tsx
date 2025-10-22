@@ -8,15 +8,18 @@ import { cn } from "@/lib/utils";
 interface Source {
   title: string;
   entryId: string;
+  chunkText: string;
+  pageNumber?: number;
 }
 
 interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
   sources?: Source[];
+  onSourceClick?: (source: Source) => void;
 }
 
-export function ChatMessage({ role, content, sources }: ChatMessageProps) {
+export function ChatMessage({ role, content, sources, onSourceClick }: ChatMessageProps) {
   const isUser = role === "user";
 
   return (
@@ -38,19 +41,17 @@ export function ChatMessage({ role, content, sources }: ChatMessageProps) {
         {sources && sources.length > 0 && (
           <div className="flex flex-col gap-1">
             <p className="text-xs text-muted-foreground">Quellen:</p>
-            {sources.map((source) => (
+            {sources.map((source, index) => (
               <Button
-                key={source.entryId}
+                key={`${source.entryId}-${index}`}
                 variant="outline"
                 size="sm"
                 className="justify-start text-xs h-auto py-1"
-                onClick={() => {
-                  // TODO: Navigate to document viewer
-                  console.log('Open document:', source.entryId);
-                }}
+                onClick={() => onSourceClick?.(source)}
               >
                 <FileText className="mr-2 h-3 w-3" />
                 {source.title}
+                {source.pageNumber && ` (Seite ${source.pageNumber})`}
               </Button>
             ))}
           </div>

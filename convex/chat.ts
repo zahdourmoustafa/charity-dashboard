@@ -49,7 +49,12 @@ export const chat = action({
 
     // Step 3: Build context from search results
     let context = "";
-    const sources: Array<{ title: string; entryId: string }> = [];
+    const sources: Array<{ 
+      title: string; 
+      entryId: string;
+      chunkText: string;
+      pageNumber?: number;
+    }> = [];
 
     // Add available documents from title search
     if (titleResults.length > 0) {
@@ -77,14 +82,32 @@ export const chat = action({
               title: entry.title || "Unbekanntes Dokument",
               chunks: [],
             });
+            
+            // Add to sources with chunk content and page number
+            const chunkText = result.content?.map((c) => c.text || "").join("\n") || "";
+            const pageNumber = result.content?.[0]?.metadata?.pageNumber as number | undefined;
+            
             sources.push({
               title: entry.title || "Unbekanntes Dokument",
               entryId: result.entryId,
+              chunkText,
+              pageNumber,
             });
           } else {
             // Skip results without matching entry
             continue;
           }
+        } else {
+          // Add additional chunks from same document
+          const chunkText = result.content?.map((c) => c.text || "").join("\n") || "";
+          const pageNumber = result.content?.[0]?.metadata?.pageNumber as number | undefined;
+          
+          sources.push({
+            title: entriesMap.get(result.entryId)!.title,
+            entryId: result.entryId,
+            chunkText,
+            pageNumber,
+          });
         }
         
         const entryData = entriesMap.get(result.entryId);

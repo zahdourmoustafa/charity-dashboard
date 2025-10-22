@@ -24,6 +24,26 @@ export const searchTitles = query({
   },
 });
 
+// Get document by RAG entry ID
+export const getByEntryId = query({
+  args: {
+    entryId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const doc = await ctx.db
+      .query("documents")
+      .filter((q) => q.eq(q.field("ragEntryId"), args.entryId))
+      .first();
+    
+    return doc ? {
+      _id: doc._id,
+      title: doc.title,
+      fileType: doc.fileType,
+      storageId: doc.storageId,
+    } : null;
+  },
+});
+
 // Generate upload URL for client
 export const generateUploadUrl = mutation({
   args: {},
