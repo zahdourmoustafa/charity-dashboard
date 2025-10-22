@@ -6,11 +6,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { extractText, getDocumentProxy } from "unpdf";
 import mammoth from "mammoth";
 import * as XLSX from "xlsx";
 
-export const runtime = "nodejs"; // Use Node.js runtime (not edge) for pdf-parse
-export const dynamic = "force-dynamic"; // Disable static optimization
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 interface ExtractionResult {
   text: string;
@@ -26,30 +27,26 @@ interface ExtractionResult {
 async function extractPDF(buffer: Buffer): Promise<ExtractionResult> {
   console.log("[PDF] Starting extraction, buffer size:", buffer.length);
   
-  // Dynamic import to avoid build-time issues
-  const pdfParse = (await import("pdf-parse")).default;
-  console.log("[PDF] pdf-parse imported successfully");
+  const pdf = await getDocumentProxy(new Uint8Array(buffer));
+  const { totalPages, text } = await extractText(pdf, { mergePages: false });
   
-  const data = await pdfParse(buffer);
-  console.log("[PDF] Extraction complete, pages:", data.numpages);
+  console.log("[PDF] Extraction complete, pages:", totalPages);
 
-  // Build page-by-page text map (estimated)
+  // Build page-by-page text map
   const pageTexts: Record<number, string> = {};
-  const textPerPage = Math.ceil(data.text.length / data.numpages);
-  
-  for (let i = 0; i < data.numpages; i++) {
-    const start = i * textPerPage;
-    const end = Math.min((i + 1) * textPerPage, data.text.length);
-    pageTexts[i + 1] = data.text.slice(start, end);
-  }
+  text.forEach((pageText, index) => {
+    pageTexts[index + 1] = pageText;
+  });
+
+  const fullText = text.join("\n");
 
   return {
-    text: data.text,
-    pageCount: data.numpages,
+    text: fullText,
+    pageCount: totalPages,
     metadata: {
       pageTexts,
       extractedAt: Date.now(),
-      wordCount: data.text.split(/\s+/).filter(w => w.length > 0).length,
+      wordCount: fullText.split(/\s+/).filter(w => w.length > 0).length,
     },
   };
 }
