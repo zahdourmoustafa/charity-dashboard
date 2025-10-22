@@ -24,10 +24,14 @@ interface ExtractionResult {
 }
 
 async function extractPDF(buffer: Buffer): Promise<ExtractionResult> {
+  console.log("[PDF] Starting extraction, buffer size:", buffer.length);
+  
   // Dynamic import to avoid build-time issues
   const pdfParse = (await import("pdf-parse")).default;
+  console.log("[PDF] pdf-parse imported successfully");
   
   const data = await pdfParse(buffer);
+  console.log("[PDF] Extraction complete, pages:", data.numpages);
 
   // Build page-by-page text map (estimated)
   const pageTexts: Record<number, string> = {};
@@ -98,11 +102,15 @@ async function extractXLSX(buffer: Buffer): Promise<ExtractionResult> {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("[API] Extract text request received");
+  
   try {
     // Get file data from request
     const formData = await request.formData();
     const file = formData.get("file") as File;
     const fileType = formData.get("fileType") as string;
+
+    console.log("[API] File type:", fileType, "File size:", file?.size);
 
     if (!file) {
       return NextResponse.json(
@@ -122,11 +130,14 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    console.log("[API] Buffer created, size:", buffer.length);
+
     // Extract text based on file type
     let result: ExtractionResult;
 
     switch (fileType) {
       case "pdf":
+        console.log("[API] Calling extractPDF");
         result = await extractPDF(buffer);
         break;
       case "docx":
@@ -142,9 +153,10 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    console.log("[API] Extraction successful, returning result");
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Text extraction error:", error);
+    console.error("[API] Text extraction error:", error);
     return NextResponse.json(
       { 
         error: "Text extraction failed",
