@@ -38,6 +38,7 @@ export default defineSchema({
     ),
     metadata: v.object({
       pageCount: v.optional(v.number()),
+      chunkCount: v.optional(v.number()),
       version: v.optional(v.string()),
       tags: v.optional(v.array(v.string())),
       errorMessage: v.optional(v.string()),

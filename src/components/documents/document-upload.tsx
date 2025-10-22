@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import {
   Dialog,
@@ -44,6 +44,7 @@ export function DocumentUpload({
 
   const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
   const createDocument = useMutation(api.documents.create);
+  const processDocument = useAction(api.documents.processDocument);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -75,17 +76,21 @@ export function DocumentUpload({
       // Step 1: Get upload URL
       const uploadUrl = await generateUploadUrl();
 
-      // Step 2: Upload file
+      // Step 2: Upload file to Convex storage
       const result = await fetch(uploadUrl, {
         method: "POST",
         headers: { "Content-Type": file.type },
         body: file,
       });
 
+      if (!result.ok) {
+        throw new Error("File upload failed");
+      }
+
       const { storageId } = await result.json();
 
       // Step 3: Save document metadata
-      await createDocument({
+      const documentId = await createDocument({
         title,
         category: category as Id<"categories">,
         storageId,
@@ -93,6 +98,15 @@ export function DocumentUpload({
         fileSize: file.size,
         uploadedBy: "admin", // TODO: Get from auth
       });
+
+      // Step 4: Trigger document processing (async - don't wait)
+      processDocument({ documentId })
+        .then(() => {
+          console.log(`Document ${documentId} processing started`);
+        })
+        .catch((error) => {
+          console.error(`Document ${documentId} processing failed:`, error);
+        });
 
       toast.success("Dokument erfolgreich hochgeladen");
       onClose();

@@ -3,7 +3,7 @@ import { internal, api } from "./_generated/api";
 import { v } from "convex/values";
 import { rag } from "./rag";
 import { extractText } from "./lib/textExtraction";
-import { chunkText, estimatePageNumbers } from "./lib/chunking";
+import { chunkText } from "./lib/chunking";
 
 // Generate upload URL for client
 export const generateUploadUrl = mutation({
@@ -169,8 +169,8 @@ export const processDocument = action({
 
       const buffer = await file.arrayBuffer();
 
-      // Step 2: Extract text
-      const { text, pageCount, metadata } = await extractText(
+      // Step 2: Extract text with page tracking
+      const { text, pageCount, metadata: extractionMetadata } = await extractText(
         buffer,
         document.fileType
       );
@@ -179,19 +179,29 @@ export const processDocument = action({
         throw new Error("No text extracted from document");
       }
 
-      // Step 3: Chunk text
-      let chunks = chunkText(text);
+      // Step 3: Chunk text with page number tracking
+      const chunks = chunkText(
+        text,
+        extractionMetadata.pageTexts, // Pass page texts for better tracking
+        2000, // chunk size
+        200   // overlap
+      );
 
-      // Step 4: Estimate page numbers (for PDFs)
-      if (document.fileType === "pdf" && pageCount) {
-        chunks = estimatePageNumbers(chunks, pageCount, text.length);
+      if (chunks.length === 0) {
+        throw new Error("No chunks created from text");
       }
 
-      // Step 5: Add to RAG with metadata
+      // Step 4: Add to RAG with page metadata
       const { entryId } = await rag.add(ctx, {
-        namespace: "practice", // Single practice for now
-        key: document._id,     // Use document ID as key (for updates)
-        chunks: chunks.map((chunk) => chunk.text),
+        namespace: "practice",
+        key: document._id,
+        chunks: chunks.map((chunk) => ({
+          text: chunk.text,
+          metadata: {
+            ...(chunk.pageNumber !== undefined && { pageNumber: chunk.pageNumber }),
+            chunkIndex: chunk.chunkIndex,
+          },
+        })),
         title: document.title,
         filterValues: [
           { name: "category", value: document.category },
@@ -201,12 +211,14 @@ export const processDocument = action({
         metadata: {
           storageId: document.storageId,
           documentId: document._id,
-          ...(pageCount ? { pageCount } : {}),
-          ...metadata,
+          pageCount,
+          ...(extractionMetadata.wordCount !== undefined && { 
+            wordCount: extractionMetadata.wordCount 
+          }),
         },
       });
 
-      // Step 6: Update document status
+      // Step 5: Update document status
       await ctx.runMutation(internal.documents.updateStatus, {
         documentId: args.documentId,
         status: "ready",
@@ -214,6 +226,7 @@ export const processDocument = action({
         metadata: {
           pageCount,
           chunkCount: chunks.length,
+          wordCount: extractionMetadata.wordCount,
         },
       });
 

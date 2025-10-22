@@ -37,7 +37,7 @@ export default function DocumentsPage() {
     try {
       await removeCategory({ id: categoryId });
       toast.success("Kategorie gelöscht");
-    } catch (error) {
+    } catch {
       toast.error("Kategorie kann nicht gelöscht werden (enthält Dokumente)");
     }
   };

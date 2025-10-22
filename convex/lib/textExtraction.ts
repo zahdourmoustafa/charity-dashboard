@@ -1,79 +1,65 @@
+/**
+ * Text Extraction Module
+ * 
+ * Calls Vercel API route for text extraction
+ * This avoids Convex sandbox restrictions
+ * 
+ * @module textExtraction
+ */
+
 export interface ExtractedText {
   text: string;
-  pageCount?: number;
-  metadata?: Record<string, any>;
-}
-
-/**
- * Extract text from PDF
- * Note: PDF extraction requires external service or client-side processing
- */
-export async function extractPdfText(
-  buffer: ArrayBuffer
-): Promise<ExtractedText> {
-  // Placeholder for PDF extraction
-  // Will be implemented with external API or client-side processing
-  return {
-    text: "[PDF content will be extracted in Phase 2]",
-    pageCount: 1,
-    metadata: {
-      note: "PDF extraction pending",
-      size: buffer.byteLength,
-    },
+  pageCount: number;
+  metadata: {
+    pageTexts?: Record<number, string>;
+    extractedAt: number;
+    wordCount?: number;
+    [key: string]: any;
   };
 }
 
 /**
- * Extract text from DOCX
- * Note: DOCX extraction requires external service or client-side processing
- */
-export async function extractDocxText(
-  buffer: ArrayBuffer
-): Promise<ExtractedText> {
-  // Placeholder for DOCX extraction
-  return {
-    text: "[DOCX content will be extracted in Phase 2]",
-    metadata: {
-      note: "DOCX extraction pending",
-      size: buffer.byteLength,
-    },
-  };
-}
-
-/**
- * Extract text from XLSX
- * Note: XLSX extraction requires external service or client-side processing
- */
-export async function extractXlsxText(
-  buffer: ArrayBuffer
-): Promise<ExtractedText> {
-  // Placeholder for XLSX extraction
-  return {
-    text: "[XLSX content will be extracted in Phase 2]",
-    metadata: {
-      note: "XLSX extraction pending",
-      size: buffer.byteLength,
-    },
-  };
-}
-
-/**
- * Main extraction function - routes to appropriate extractor
+ * Extract text by calling Vercel API
  */
 export async function extractText(
   buffer: ArrayBuffer,
   fileType: "pdf" | "docx" | "xlsx" | "image"
 ): Promise<ExtractedText> {
-  switch (fileType) {
-    case "pdf":
-      return extractPdfText(buffer);
-    case "docx":
-      return extractDocxText(buffer);
-    case "xlsx":
-      return extractXlsxText(buffer);
-    case "image":
-      throw new Error("Image OCR not yet implemented");
-    default:
-      throw new Error(`Unsupported file type: ${fileType}`);
+  if (!buffer || buffer.byteLength === 0) {
+    throw new Error("Empty or invalid file buffer");
+  }
+
+  if (fileType === "image") {
+    throw new Error("Image text extraction not supported (requires OCR)");
+  }
+
+  // Get Vercel API URL from environment
+  const apiUrl = process.env.VERCEL_API_URL || "https://german-dentist.vercel.app";
+  const extractUrl = `${apiUrl}/api/extract-text`;
+
+  try {
+    // Create FormData with file
+    const formData = new FormData();
+    const blob = new Blob([buffer]);
+    formData.append("file", blob, `document.${fileType}`);
+    formData.append("fileType", fileType);
+
+    // Call Vercel API
+    const response = await fetch(extractUrl, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.details || error.error || "Extraction failed");
+    }
+
+    const result: ExtractedText = await response.json();
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Text extraction failed: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
   }
 }

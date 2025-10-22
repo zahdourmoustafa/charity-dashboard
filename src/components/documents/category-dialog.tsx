@@ -65,7 +65,7 @@ export function CategoryDialog({ open, onClose, category }: CategoryDialogProps)
       }
       onClose();
       setName("");
-    } catch (error) {
+    } catch {
       toast.error("Fehler beim Speichern");
     } finally {
       setLoading(false);
