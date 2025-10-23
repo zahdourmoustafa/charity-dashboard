@@ -11,6 +11,9 @@ import { SourcePreviewSidebar } from "@/components/chat/source-preview-sidebar";
 import { MessageSquare, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+// Force dynamic rendering to prevent build-time Convex queries
+export const dynamic = 'force-dynamic';
+
 interface Source {
   title: string;
   entryId: string;

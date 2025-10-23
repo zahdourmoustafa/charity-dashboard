@@ -1,6 +1,9 @@
 "use client";
 
 import { FileText, MessageSquare, Home } from "lucide-react";
+
+// Force dynamic rendering to prevent build-time issues
+export const dynamic = 'force-dynamic';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {

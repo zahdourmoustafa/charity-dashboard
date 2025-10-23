@@ -13,6 +13,9 @@ import { CategoryDialog } from "@/components/documents/category-dialog";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { toast } from "sonner";
 
+// Force dynamic rendering to prevent build-time Convex queries
+export const dynamic = 'force-dynamic';
+
 export default function DocumentsPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
