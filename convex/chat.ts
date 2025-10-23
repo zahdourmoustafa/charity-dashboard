@@ -120,7 +120,7 @@ export const chat = action({
         
         // Add content
         context += "--- Dokumentinhalte ---\n";
-        searchResults.contentMatches.forEach((match, idx) => {
+        searchResults.contentMatches.forEach((match) => {
           context += `\n[${match.title}${match.pageNumber ? `, Seite ${match.pageNumber}` : ''}]\n`;
           context += `${match.chunkText}\n`;
           

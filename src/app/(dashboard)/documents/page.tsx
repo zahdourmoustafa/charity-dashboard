@@ -20,12 +20,24 @@ export default function DocumentsPage() {
   const [editingCategory, setEditingCategory] = useState<{ _id: Id<"categories">; nameGerman: string } | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  const categoriesWithCounts = useQuery(api.categories.listWithCounts);
+  const categoriesWithCounts = useQuery(api.categories.listWithCounts) || [];
   const documents = useQuery(
     api.documents.list,
     selectedCategory ? { category: selectedCategory } : {}
-  );
+  ) || [];
   const removeCategory = useMutation(api.categories.remove);
+
+  // Show loading state if data is still loading
+  if (categoriesWithCounts === undefined) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Lade Daten...</p>
+        </div>
+      </div>
+    );
+  }
 
   const selectedCategoryData = categoriesWithCounts?.find(
     (c) => c._id === selectedCategory
