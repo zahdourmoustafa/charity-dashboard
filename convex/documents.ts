@@ -44,6 +44,44 @@ export const getByEntryId = query({
   },
 });
 
+// Get all document titles for fuzzy search
+export const getAllTitles = query({
+  args: {},
+  handler: async (ctx) => {
+    const docs = await ctx.db
+      .query("documents")
+      .filter((q) => q.eq(q.field("status"), "ready"))
+      .collect();
+    
+    return docs.map((doc) => ({
+      _id: doc._id,
+      title: doc.title,
+      fileType: doc.fileType,
+    }));
+  },
+});
+
+// Get document by exact title match
+export const getByTitle = query({
+  args: {
+    title: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const doc = await ctx.db
+      .query("documents")
+      .filter((q) => q.eq(q.field("title"), args.title))
+      .filter((q) => q.eq(q.field("status"), "ready"))
+      .first();
+    
+    return doc ? {
+      _id: doc._id,
+      title: doc.title,
+      fileType: doc.fileType,
+      storageId: doc.storageId,
+    } : null;
+  },
+});
+
 // Generate upload URL for client
 export const generateUploadUrl = mutation({
   args: {},

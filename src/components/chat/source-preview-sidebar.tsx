@@ -26,15 +26,32 @@ interface SourcePreviewSidebarProps {
 }
 
 export function SourcePreviewSidebar({ isOpen, onClose, source }: SourcePreviewSidebarProps) {
-  const document = useQuery(
+  console.log("SourcePreviewSidebar - source:", source);
+  
+  // Try to get document by entryId first
+  const documentByEntry = useQuery(
     api.documents.getByEntryId,
-    source ? { entryId: source.entryId } : "skip"
+    source && source.entryId ? { entryId: source.entryId } : "skip"
   );
+  
+  // Fallback to title search if entryId query returns null or if no entryId
+  const documentByTitle = useQuery(
+    api.documents.getByTitle,
+    source && (!source.entryId || documentByEntry === null) ? { title: source.title } : "skip"
+  );
+  
+  const document = documentByEntry || documentByTitle;
+  
+  console.log("SourcePreviewSidebar - documentByEntry:", documentByEntry);
+  console.log("SourcePreviewSidebar - documentByTitle:", documentByTitle);
+  console.log("SourcePreviewSidebar - document:", document);
   
   const downloadUrl = useQuery(
     api.documents.getDownloadUrl,
     document ? { storageId: document.storageId } : "skip"
   );
+  
+  console.log("SourcePreviewSidebar - downloadUrl:", downloadUrl);
 
   const searchPluginInstance = searchPlugin({
     keyword: source?.chunkText.slice(0, 100) || "",

@@ -41,19 +41,22 @@ export function ChatMessage({ role, content, sources, onSourceClick }: ChatMessa
         {sources && sources.length > 0 && (
           <div className="flex flex-col gap-1">
             <p className="text-xs text-muted-foreground">Quellen:</p>
-            {sources.map((source, index) => (
-              <Button
-                key={`${source.entryId}-${index}`}
-                variant="outline"
-                size="sm"
-                className="justify-start text-xs h-auto py-1"
-                onClick={() => onSourceClick?.(source)}
-              >
-                <FileText className="mr-2 h-3 w-3" />
-                {source.title}
-                {source.pageNumber && ` (Seite ${source.pageNumber})`}
-              </Button>
-            ))}
+            <div className="flex flex-wrap gap-2">
+              {sources.map((source, index) => (
+                <Button
+                  key={`${source.entryId}-${index}`}
+                  variant="outline"
+                  size="sm"
+                  className="justify-start text-xs h-auto py-1.5 px-3"
+                  onClick={() => onSourceClick?.(source)}
+                >
+                  <span className="font-semibold mr-1">[{index + 1}]</span>
+                  <FileText className="mr-1.5 h-3 w-3" />
+                  {source.title}
+                  {source.pageNumber && `, S. ${source.pageNumber}`}
+                </Button>
+              ))}
+            </div>
           </div>
         )}
       </div>
