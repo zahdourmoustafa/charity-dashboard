@@ -14,6 +14,23 @@ export default defineSchema({
     .index("by_order", ["order"])
     .index("by_parent", ["parentId"]),
 
+  // Leads/Employees from n8n
+  leads: defineTable({
+    name: v.string(),
+    email: v.string(),
+    jobTitle: v.string(),
+    department: v.string(),
+    startDate: v.string(),
+    manager: v.string(),
+    equipment: v.string(),
+    status: v.optional(v.string()),
+    timestamp: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_department", ["department"])
+    .index("by_created_at", ["createdAt"]),
+
   // Documents (PDFs, DOCX, XLSX, images)
   documents: defineTable({
     title: v.string(),

@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, MessageSquare, Home } from "lucide-react";
+import { FileText, MessageSquare, Home, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -26,6 +26,11 @@ const menuItems = [
     title: "Documents",
     url: "/documents",
     icon: FileText,
+  },
+  {
+    title: "Employees",
+    url: "/leads",
+    icon: Users,
   },
   {
     title: "AI Assistant",

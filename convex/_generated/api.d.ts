@@ -11,6 +11,7 @@
 import type * as categories from "../categories.js";
 import type * as chat from "../chat.js";
 import type * as documents from "../documents.js";
+import type * as leads from "../leads.js";
 import type * as lib_chunking from "../lib/chunking.js";
 import type * as lib_hybridSearch from "../lib/hybridSearch.js";
 import type * as lib_queryClassifier from "../lib/queryClassifier.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   categories: typeof categories;
   chat: typeof chat;
   documents: typeof documents;
+  leads: typeof leads;
   "lib/chunking": typeof lib_chunking;
   "lib/hybridSearch": typeof lib_hybridSearch;
   "lib/queryClassifier": typeof lib_queryClassifier;
