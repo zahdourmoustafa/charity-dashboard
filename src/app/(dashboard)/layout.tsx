@@ -53,7 +53,7 @@ export default function DashboardLayout({
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupLabel className="text-lg font-bold px-4 py-6">
-                Practice QMS
+                Nonprofit Dashboard
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
@@ -79,7 +79,7 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-auto">
           <div className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 lg:hidden">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold">Practice QMS</h1>
+            <h1 className="text-lg font-semibold">Nonprofit Dashboard</h1>
           </div>
           <div className="p-4 lg:p-6">{children}</div>
       </main>

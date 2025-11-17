@@ -127,7 +127,7 @@ export function DocumentUpload({
         <DialogHeader>
           <DialogTitle>Upload Document</DialogTitle>
           <DialogDescription>
-            Upload a new document to your practice
+            Upload a new document to your organization
           </DialogDescription>
         </DialogHeader>
 

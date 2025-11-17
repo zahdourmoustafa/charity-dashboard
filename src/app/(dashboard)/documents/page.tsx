@@ -66,7 +66,7 @@ export default function DocumentsPage() {
           <div>
             <h1 className="text-3xl font-bold">Documents</h1>
             <p className="text-muted-foreground">
-              Organize your practice documents in categories
+              Organize your organization documents in categories
             </p>
           </div>
           <Button onClick={() => setShowCategoryDialog(true)}>

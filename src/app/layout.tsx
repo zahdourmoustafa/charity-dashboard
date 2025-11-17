@@ -10,8 +10,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Practice QMS - Quality Management System",
-  description: "Quality Management System for Dental Practices",
+  title: "Nonprofit Dashboard - Employee Management System",
+  description: "Employee Management System for Nonprofit Organizations",
 };
 
 export default function RootLayout({
