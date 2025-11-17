@@ -18,7 +18,6 @@ import {
 interface Category {
   _id: Id<"categories">;
   name: string;
-  nameGerman: string;
   icon?: string;
 }
 
@@ -46,7 +45,7 @@ export function CategorySidebar({
 }: CategorySidebarProps) {
   return (
     <Card className="p-4">
-      <h2 className="mb-4 font-semibold">Kategorien</h2>
+      <h2 className="mb-4 font-semibold">Categories</h2>
       <div className="space-y-1">
         <Button
           variant={selectedCategory === null ? "secondary" : "ghost"}
@@ -54,7 +53,7 @@ export function CategorySidebar({
           onClick={() => onSelectCategory(null)}
         >
           <FileText className="mr-2 h-4 w-4" />
-          Alle Dokumente
+          All Documents
         </Button>
         {categories.map((category) => {
           const Icon = category.icon ? iconMap[category.icon] : FileText;
@@ -66,7 +65,7 @@ export function CategorySidebar({
               onClick={() => onSelectCategory(category._id)}
             >
               <Icon className="mr-2 h-4 w-4" />
-              <span className="truncate">{category.nameGerman}</span>
+              <span className="truncate">{category.name}</span>
             </Button>
           );
         })}

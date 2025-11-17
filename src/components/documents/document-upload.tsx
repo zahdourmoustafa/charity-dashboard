@@ -27,7 +27,7 @@ import { Id } from "../../../convex/_generated/dataModel";
 interface DocumentUploadProps {
   open: boolean;
   onClose: () => void;
-  categories: Array<{ _id: Id<"categories">; nameGerman: string }>;
+  categories: Array<{ _id: Id<"categories">; name: string }>;
   defaultCategory?: Id<"categories">;
 }
 
@@ -66,7 +66,7 @@ export function DocumentUpload({
 
   const handleUpload = async () => {
     if (!file || !title || !category) {
-      toast.error("Bitte füllen Sie alle Felder aus");
+      toast.error("Please fill in all fields");
       return;
     }
 
@@ -108,14 +108,14 @@ export function DocumentUpload({
           console.error(`Document ${documentId} processing failed:`, error);
         });
 
-      toast.success("Dokument erfolgreich hochgeladen");
+      toast.success("Document uploaded successfully");
       onClose();
       setFile(null);
       setTitle("");
       setCategory("");
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Fehler beim Hochladen");
+      toast.error("Error uploading");
     } finally {
       setUploading(false);
     }
@@ -125,16 +125,16 @@ export function DocumentUpload({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Dokument hochladen</DialogTitle>
+          <DialogTitle>Upload Document</DialogTitle>
           <DialogDescription>
-            Laden Sie ein neues Dokument in Ihre Praxis hoch
+            Upload a new document to your practice
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {/* File Input */}
           <div className="space-y-2">
-            <Label htmlFor="file">Datei</Label>
+            <Label htmlFor="file">File</Label>
             <div className="flex items-center gap-2">
               <Input
                 id="file"
@@ -155,27 +155,27 @@ export function DocumentUpload({
 
           {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="title">Titel</Label>
+            <Label htmlFor="title">Title</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="z.B. Hygieneplan 2024"
+              placeholder="e.g. Hygiene Plan 2024"
               disabled={uploading}
             />
           </div>
 
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">Kategorie</Label>
+            <Label htmlFor="category">Category</Label>
             <Select value={category} onValueChange={(v) => setCategory(v as Id<"categories">)} disabled={uploading}>
               <SelectTrigger>
-                <SelectValue placeholder="Kategorie wählen" />
+                <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
                   <SelectItem key={cat._id} value={cat._id}>
-                    {cat.nameGerman}
+                    {cat.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -186,18 +186,18 @@ export function DocumentUpload({
         {/* Actions */}
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={uploading}>
-            Abbrechen
+            Cancel
           </Button>
           <Button onClick={handleUpload} disabled={uploading || !file || !title || !category}>
             {uploading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Hochladen...
+                Uploading...
               </>
             ) : (
               <>
                 <Upload className="mr-2 h-4 w-4" />
-                Hochladen
+                Upload
               </>
             )}
           </Button>

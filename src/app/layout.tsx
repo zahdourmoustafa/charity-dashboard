@@ -10,8 +10,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Praxis QMS - Qualitätsmanagement System",
-  description: "Qualitätsmanagement System für Zahnarztpraxen",
+  title: "Practice QMS - Quality Management System",
+  description: "Quality Management System for Dental Practices",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de">
+    <html lang="en">
       <body className={`${poppins.variable} font-sans antialiased`}>
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>

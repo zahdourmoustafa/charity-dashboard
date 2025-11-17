@@ -14,7 +14,7 @@ import { Id } from "../../../convex/_generated/dataModel";
 interface CategoryCardProps {
   category: {
     _id: Id<"categories">;
-    nameGerman: string;
+    name: string;
     icon?: string;
     documentCount: number;
   };
@@ -39,9 +39,9 @@ export function CategoryCard({
                 <Folder className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">{category.nameGerman}</h3>
+                <h3 className="font-semibold text-lg">{category.name}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {category.documentCount} {category.documentCount === 1 ? "Dokument" : "Dokumente"}
+                  {category.documentCount} {category.documentCount === 1 ? "Document" : "Documents"}
                 </p>
               </div>
             </div>
@@ -56,7 +56,7 @@ export function CategoryCard({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(); }}>
                 <Pencil className="mr-2 h-4 w-4" />
-                Umbenennen
+                Rename
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={(e) => { e.stopPropagation(); onDelete(); }}
@@ -64,7 +64,7 @@ export function CategoryCard({
                 disabled={category.documentCount > 0}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Löschen
+                Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

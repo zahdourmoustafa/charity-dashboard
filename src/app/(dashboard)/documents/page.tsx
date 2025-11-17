@@ -20,7 +20,7 @@ export default function DocumentsPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [showCategoryDialog, setShowCategoryDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Id<"categories"> | null>(null);
-  const [editingCategory, setEditingCategory] = useState<{ _id: Id<"categories">; nameGerman: string } | null>(null);
+  const [editingCategory, setEditingCategory] = useState<{ _id: Id<"categories">; name: string } | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   const categoriesWithCounts = useQuery(api.categories.listWithCounts) || [];
@@ -36,7 +36,7 @@ export default function DocumentsPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Lade Daten...</p>
+          <p className="text-gray-600">Loading data...</p>
         </div>
       </div>
     );
@@ -47,13 +47,13 @@ export default function DocumentsPage() {
   );
 
   const handleDeleteCategory = async (categoryId: Id<"categories">) => {
-    if (!confirm("Möchten Sie diese Kategorie wirklich löschen?")) return;
+    if (!confirm("Do you really want to delete this category?")) return;
 
     try {
       await removeCategory({ id: categoryId });
-      toast.success("Kategorie gelöscht");
+      toast.success("Category deleted");
     } catch {
-      toast.error("Kategorie kann nicht gelöscht werden (enthält Dokumente)");
+      toast.error("Category cannot be deleted (contains documents)");
     }
   };
 
@@ -64,14 +64,14 @@ export default function DocumentsPage() {
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Dokumente</h1>
+            <h1 className="text-3xl font-bold">Documents</h1>
             <p className="text-muted-foreground">
-              Organisieren Sie Ihre Praxisdokumente in Kategorien
+              Organize your practice documents in categories
             </p>
           </div>
           <Button onClick={() => setShowCategoryDialog(true)}>
             <FolderPlus className="mr-2 h-4 w-4" />
-            Neue Kategorie
+            New Category
           </Button>
         </div>
 
@@ -88,18 +88,18 @@ export default function DocumentsPage() {
         {/* Categories Grid */}
         {categoriesWithCounts === undefined ? (
           <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Laden...</p>
+            <p className="text-muted-foreground">Loading...</p>
           </div>
         ) : categoriesWithCounts.length === 0 ? (
           <Card className="flex flex-col items-center justify-center py-12">
             <FolderPlus className="h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">Keine Kategorien</h3>
+            <h3 className="mt-4 text-lg font-semibold">No Categories</h3>
             <p className="mt-2 text-sm text-muted-foreground">
-              Erstellen Sie Ihre erste Kategorie
+              Create your first category
             </p>
             <Button className="mt-4" onClick={() => setShowCategoryDialog(true)}>
               <FolderPlus className="mr-2 h-4 w-4" />
-              Kategorie erstellen
+              Create Category
             </Button>
           </Card>
         ) : (
@@ -112,7 +112,7 @@ export default function DocumentsPage() {
                 onEdit={() => {
                   setEditingCategory({
                     _id: category._id,
-                    nameGerman: category.nameGerman,
+                    name: category.name,
                   });
                   setShowCategoryDialog(true);
                 }}
@@ -136,19 +136,19 @@ export default function DocumentsPage() {
           onClick={() => setSelectedCategory(null)}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Zurück zu Kategorien
+          Back to Categories
         </Button>
 
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">{selectedCategoryData?.nameGerman}</h1>
+            <h1 className="text-3xl font-bold">{selectedCategoryData?.name}</h1>
             <p className="text-muted-foreground">
-              {documents?.length || 0} {documents?.length === 1 ? "Dokument" : "Dokumente"}
+              {documents?.length || 0} {documents?.length === 1 ? "Document" : "Documents"}
             </p>
           </div>
           <Button onClick={() => setShowUpload(true)}>
             <Upload className="mr-2 h-4 w-4" />
-            Dokument hochladen
+            Upload Document
           </Button>
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function DocumentsPage() {
       {/* View Toggle */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {documents?.length || 0} Dokumente
+          {documents?.length || 0} Documents
         </p>
         <div className="flex gap-2">
           <Button
@@ -189,18 +189,18 @@ export default function DocumentsPage() {
       {/* Documents List */}
       {documents === undefined ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-muted-foreground">Laden...</p>
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       ) : documents.length === 0 ? (
         <Card className="flex flex-col items-center justify-center py-12">
           <FileText className="h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-4 text-lg font-semibold">Keine Dokumente</h3>
+          <h3 className="mt-4 text-lg font-semibold">No Documents</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Laden Sie Ihr erstes Dokument in diese Kategorie hoch
+            Upload your first document to this category
           </p>
           <Button className="mt-4" onClick={() => setShowUpload(true)}>
             <Upload className="mr-2 h-4 w-4" />
-            Dokument hochladen
+            Upload Document
           </Button>
         </Card>
       ) : (

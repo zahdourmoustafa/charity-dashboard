@@ -26,12 +26,12 @@ const menuItems = [
     icon: Home,
   },
   {
-    title: "Dokumente",
+    title: "Documents",
     url: "/documents",
     icon: FileText,
   },
   {
-    title: "AI-Assistent",
+    title: "AI Assistant",
     url: "/chat",
     icon: MessageSquare,
   },
@@ -51,7 +51,7 @@ export default function DashboardLayout({
           <SidebarContent>
             <SidebarGroup>
               <SidebarGroupLabel className="text-lg font-bold px-4 py-6">
-                Praxis QMS
+                Practice QMS
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
@@ -64,7 +64,7 @@ export default function DashboardLayout({
                         <Link href={item.url}>
                           <item.icon className="h-4 w-4" />
                           <span>{item.title}</span>
-                        </Link>
+                </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
@@ -77,11 +77,11 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-auto">
           <div className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background px-4 lg:hidden">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold">Praxis QMS</h1>
+            <h1 className="text-lg font-semibold">Practice QMS</h1>
           </div>
           <div className="p-4 lg:p-6">{children}</div>
-        </main>
-      </div>
+      </main>
+    </div>
     </SidebarProvider>
   );
 }

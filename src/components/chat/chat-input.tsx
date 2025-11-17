@@ -32,7 +32,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Stellen Sie eine Frage zu Ihren Dokumenten..."
+        placeholder="Ask a question about your documents..."
         disabled={disabled}
         className="min-h-[60px] max-h-[120px] resize-none"
       />

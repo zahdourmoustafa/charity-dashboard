@@ -5,38 +5,38 @@ import { streamText } from "ai";
 import { classifyQuery } from "./lib/queryClassifier";
 import { hybridSearch } from "./lib/hybridSearch";
 
-const SYSTEM_PROMPT = `Du bist ein Qualitätsmanagement-Assistent für Zahnarztpraxen (LZK Baden-Württemberg).
+const SYSTEM_PROMPT = `You are an AI Consultant Helper for nonprofit organizations.
 
-WICHTIGE REGELN:
-1. Beantworte Fragen NUR anhand der bereitgestellten Dokumente
-2. Bei LOCATION-Fragen (Wo finde ich...?):
-   - Wenn "Verfügbare Dokumente" aufgelistet sind, antworte: "Das Dokument '[Name]' ist in der Dokumentenliste verfügbar."
-   - Gib den genauen Dokumentnamen an
-3. Bei CONTENT-Fragen (Wie, Was, Wann...?):
-   - Beantworte basierend auf "Dokumentinhalte"
-   - Zitiere ALLE verwendeten Quellen am Ende
-4. Bei "Ähnliche Dokumente": Frage "Meinten Sie: [Liste]?"
-5. Wenn nichts gefunden: "Diese Information finde ich nicht. Bitte wende dich an die Praxisleitung."
-6. Halte Antworten präzise (3-7 Sätze)
-7. Verwende einfache, klare Sprache
-8. Verwende Aufzählungen (•) für Anleitungen
+IMPORTANT RULES:
+1. Answer questions ONLY based on the provided documents
+2. For LOCATION questions (Where can I find...?):
+   - If "Available Documents" are listed, respond: "The document '[Name]' is available in the document list."
+   - Provide the exact document name
+3. For CONTENT questions (How, What, When...?):
+   - Answer based on "Document Contents"
+   - Cite ALL sources used at the end
+4. For "Similar Documents": Ask "Did you mean: [List]?"
+5. If nothing found: "I cannot find this information. Please contact your organization's leadership."
+6. Keep answers concise (3-7 sentences)
+7. Use simple, clear language
+8. Use bullet points (•) for instructions
 
-ANTWORTFORMAT:
-[Klare Antwort auf Deutsch]
+RESPONSE FORMAT:
+[Clear answer in English]
 
-[Schritte falls zutreffend]
+[Steps if applicable]
 
-Quellen:
-[1] Dokumentname, Seite X
-[2] Dokumentname, Seite Y
-[3] Dokumentname, Seite Z
+Sources:
+[1] Document name, Page X
+[2] Document name, Page Y
+[3] Document name, Page Z
 
-WICHTIG: Liste ALLE Dokumente auf, die du für die Antwort verwendet hast. Nummeriere sie [1], [2], [3], etc.
+IMPORTANT: List ALL documents you used for the answer. Number them [1], [2], [3], etc.
 
-KONTEXT:
+CONTEXT:
 {context}
 
-Beantworte die folgende Frage basierend auf dem Kontext:`;
+Answer the following question based on the context:`;
 
 export const chat = action({
   args: {
@@ -70,7 +70,7 @@ export const chat = action({
     // For location queries, prioritize document matches
     if (classified.intent === "location" || classified.intent === "action") {
       if (searchResults.documentMatches.length > 0) {
-        context += "--- Verfügbare Dokumente ---\n";
+        context += "--- Available Documents ---\n";
         searchResults.documentMatches.forEach((doc) => {
           context += `• ${doc.title} (${doc.fileType.toUpperCase()}) [${doc.matchType} match, score: ${doc.score.toFixed(2)}]\n`;
         });
@@ -86,7 +86,7 @@ export const chat = action({
         });
       } else if (searchResults.contentMatches.length > 0) {
         // Fallback to content if no document matches
-        context += "--- Verfügbare Dokumente ---\n";
+        context += "--- Available Documents ---\n";
         const uniqueTitles = new Set<string>();
         searchResults.contentMatches.forEach((match) => {
           if (!uniqueTitles.has(match.title)) {
@@ -97,7 +97,7 @@ export const chat = action({
         context += "\n";
         sources.push(...searchResults.contentMatches);
       } else {
-        context = "Keine relevanten Dokumente gefunden.";
+        context = "No relevant documents found.";
       }
     }
     
@@ -111,7 +111,7 @@ export const chat = action({
         });
         
         if (uniqueTitles.size > 0) {
-          context += "--- Verfügbare Dokumente ---\n";
+          context += "--- Available Documents ---\n";
           uniqueTitles.forEach((title) => {
             context += `• ${title}\n`;
           });
@@ -119,9 +119,9 @@ export const chat = action({
         }
         
         // Add content
-        context += "--- Dokumentinhalte ---\n";
+        context += "--- Document Contents ---\n";
         searchResults.contentMatches.forEach((match) => {
-          context += `\n[${match.title}${match.pageNumber ? `, Seite ${match.pageNumber}` : ''}]\n`;
+          context += `\n[${match.title}${match.pageNumber ? `, Page ${match.pageNumber}` : ''}]\n`;
           context += `${match.chunkText}\n`;
           
           // Add to sources
@@ -129,13 +129,13 @@ export const chat = action({
         });
       } else if (searchResults.documentMatches.length > 0) {
         // Found documents but no content
-        context += "--- Verfügbare Dokumente ---\n";
+        context += "--- Available Documents ---\n";
         searchResults.documentMatches.forEach((doc) => {
           context += `• ${doc.title}\n`;
         });
-        context += "\nHinweis: Dokumente gefunden, aber keine spezifischen Inhalte zur Frage.\n";
+        context += "\nNote: Documents found, but no specific content for the question.\n";
       } else {
-        context = "Keine relevanten Dokumente gefunden.";
+        context = "No relevant documents found.";
       }
     }
     
@@ -181,7 +181,7 @@ export const chat = action({
     } catch (error) {
       console.error("OpenAI API error:", error);
       return {
-        response: "Entschuldigung, es gab einen Fehler bei der Verarbeitung Ihrer Anfrage. Bitte versuchen Sie es später erneut.",
+        response: "Sorry, there was an error processing your request. Please try again later.",
         sources: [],
         metadata: {
           intent: classified.intent,

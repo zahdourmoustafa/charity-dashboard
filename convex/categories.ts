@@ -5,7 +5,6 @@ import { v } from "convex/values";
 export const create = mutation({
   args: {
     name: v.string(),
-    nameGerman: v.string(),
     icon: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -14,8 +13,7 @@ export const create = mutation({
     const maxOrder = Math.max(...categories.map((c) => c.order), 0);
 
     const categoryId = await ctx.db.insert("categories", {
-      name: args.name.toLowerCase().replace(/\s+/g, "_"),
-      nameGerman: args.nameGerman,
+      name: args.name,
       description: "",
       icon: args.icon || "folder",
       order: maxOrder + 1,
@@ -30,12 +28,12 @@ export const create = mutation({
 export const update = mutation({
   args: {
     id: v.id("categories"),
-    nameGerman: v.string(),
+    name: v.string(),
     icon: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.id, {
-      nameGerman: args.nameGerman,
+      name: args.name,
       ...(args.icon && { icon: args.icon }),
     });
   },
@@ -111,14 +109,14 @@ export const seedCategories = mutation({
     }
 
     const categories = [
-      { name: "laws", nameGerman: "Gesetze und Rechtliche Grundlagen", description: "", icon: "scale", order: 1 },
-      { name: "quality_assurance", nameGerman: "Qualitätssicherung", description: "", icon: "shield-check", order: 2 },
-      { name: "hygiene", nameGerman: "Hygiene und Medizinprodukte", description: "", icon: "droplet", order: 3 },
-      { name: "personnel", nameGerman: "Personal", description: "", icon: "users", order: 4 },
-      { name: "forms", nameGerman: "Formulare", description: "", icon: "file-text", order: 5 },
-      { name: "contracts", nameGerman: "Verträge", description: "", icon: "file-signature", order: 6 },
-      { name: "inspection", nameGerman: "Praxisbegehung", description: "", icon: "clipboard-check", order: 7 },
-      { name: "bus_service", nameGerman: "BuS-Dienst", description: "", icon: "heart-pulse", order: 8 },
+      { name: "Laws and Legal Foundations", description: "", icon: "scale", order: 1 },
+      { name: "Quality Assurance", description: "", icon: "shield-check", order: 2 },
+      { name: "Hygiene and Medical Devices", description: "", icon: "droplet", order: 3 },
+      { name: "Personnel", description: "", icon: "users", order: 4 },
+      { name: "Forms", description: "", icon: "file-text", order: 5 },
+      { name: "Contracts", description: "", icon: "file-signature", order: 6 },
+      { name: "Practice Inspection", description: "", icon: "clipboard-check", order: 7 },
+      { name: "Emergency Service", description: "", icon: "heart-pulse", order: 8 },
     ];
 
     for (const category of categories) {

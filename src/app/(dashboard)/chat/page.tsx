@@ -74,16 +74,16 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Chat error:", error);
-      toast.error("Fehler beim Senden der Nachricht");
+      toast.error("Error sending message");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleClear = () => {
-    if (confirm("Möchten Sie den Chat-Verlauf wirklich löschen?")) {
+    if (confirm("Do you really want to delete the chat history?")) {
       setMessages([]);
-      toast.success("Chat-Verlauf gelöscht");
+      toast.success("Chat history deleted");
     }
   };
 
@@ -92,15 +92,15 @@ export default function ChatPage() {
       {/* Header */}
       <div className="flex items-center justify-between pb-4">
         <div>
-          <h1 className="text-3xl font-bold">AI-Assistent</h1>
+          <h1 className="text-3xl font-bold">AI Assistant</h1>
           <p className="text-muted-foreground">
-            Stellen Sie Fragen zu Ihren Dokumenten
+            Ask questions about your documents
           </p>
         </div>
         {messages.length > 0 && (
           <Button variant="outline" size="sm" onClick={handleClear}>
             <Trash2 className="mr-2 h-4 w-4" />
-            Verlauf löschen
+            Clear History
           </Button>
         )}
       </div>
@@ -113,19 +113,19 @@ export default function ChatPage() {
               <div className="flex h-full flex-col items-center justify-center text-center">
                 <MessageSquare className="h-12 w-12 text-muted-foreground" />
                 <h3 className="mt-4 text-lg font-semibold">
-                  Willkommen beim AI-Assistenten
+                  Welcome to the AI Assistant
                 </h3>
                 <p className="mt-2 text-sm text-muted-foreground max-w-md">
-                  Stellen Sie Fragen zu Ihren hochgeladenen Dokumenten. Der
-                  Assistent durchsucht Ihre Dokumente und gibt Ihnen präzise
-                  Antworten mit Quellenangaben.
+                  Ask questions about your uploaded documents. The
+                  assistant searches your documents and provides you with precise
+                  answers with source references.
                 </p>
                 <div className="mt-6 space-y-2 text-left">
-                  <p className="text-sm font-medium">Beispielfragen:</p>
+                  <p className="text-sm font-medium">Example questions:</p>
                   <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li>• Was steht im Hygieneplan über Sterilisation?</li>
-                    <li>• Welche Formulare brauche ich für neue Mitarbeiter?</li>
-                    <li>• Wie oft muss die Praxisbegehung stattfinden?</li>
+                    <li>• What does the hygiene plan say about sterilization?</li>
+                    <li>• Which forms do I need for new employees?</li>
+                    <li>• How often must the practice inspection take place?</li>
                   </ul>
                 </div>
               </div>

@@ -39,7 +39,7 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
     if (doc.fileType === "pdf") {
       setViewingDoc(doc);
     } else {
-      toast.info("Vorschau nur für PDF-Dateien verfügbar");
+      toast.info("Preview only available for PDF files");
     }
   };
 
@@ -49,21 +49,21 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
       const url = `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${doc.storageId}`;
       window.open(url, "_blank");
     } catch {
-      toast.error("Fehler beim Herunterladen");
+      toast.error("Error downloading");
     }
   };
 
   const handleDelete = async (doc: Document) => {
-    if (!confirm(`Möchten Sie "${doc.title}" wirklich löschen?`)) return;
+    if (!confirm(`Do you really want to delete "${doc.title}"?`)) return;
 
     try {
       await removeDocument({
         id: doc._id,
         userId: "admin", // TODO: Get from auth
       });
-      toast.success("Dokument gelöscht");
+      toast.success("Document deleted");
     } catch {
-      toast.error("Fehler beim Löschen");
+      toast.error("Error deleting");
     }
   };
 
@@ -83,11 +83,11 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
   const getStatusText = (status: string) => {
     switch (status) {
       case "ready":
-        return "Bereit";
+        return "Ready";
       case "processing":
-        return "Verarbeitung";
+        return "Processing";
       case "error":
-        return "Fehler";
+        return "Error";
       default:
         return status;
     }
@@ -132,7 +132,7 @@ export function DocumentList({ documents, viewMode }: DocumentListProps) {
                 disabled={doc.status !== "ready"}
               >
                 <Eye className="mr-2 h-4 w-4" />
-                Ansehen
+                View
               </Button>
               <Button
                 variant="outline"

@@ -22,7 +22,7 @@ interface CategoryDialogProps {
   onClose: () => void;
   category?: {
     _id: Id<"categories">;
-    nameGerman: string;
+    name: string;
   } | null;
 }
 
@@ -35,7 +35,7 @@ export function CategoryDialog({ open, onClose, category }: CategoryDialogProps)
 
   useEffect(() => {
     if (category) {
-      setName(category.nameGerman);
+      setName(category.name);
     } else {
       setName("");
     }
@@ -43,7 +43,7 @@ export function CategoryDialog({ open, onClose, category }: CategoryDialogProps)
 
   const handleSubmit = async () => {
     if (!name.trim()) {
-      toast.error("Bitte geben Sie einen Namen ein");
+      toast.error("Please enter a name");
       return;
     }
 
@@ -53,20 +53,19 @@ export function CategoryDialog({ open, onClose, category }: CategoryDialogProps)
       if (category) {
         await updateCategory({
           id: category._id,
-          nameGerman: name.trim(),
+          name: name.trim(),
         });
-        toast.success("Kategorie aktualisiert");
+        toast.success("Category updated");
       } else {
         await createCategory({
           name: name.trim(),
-          nameGerman: name.trim(),
         });
-        toast.success("Kategorie erstellt");
+        toast.success("Category created");
       }
       onClose();
       setName("");
     } catch {
-      toast.error("Fehler beim Speichern");
+      toast.error("Error saving");
     } finally {
       setLoading(false);
     }
@@ -77,23 +76,23 @@ export function CategoryDialog({ open, onClose, category }: CategoryDialogProps)
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {category ? "Kategorie umbenennen" : "Neue Kategorie"}
+            {category ? "Rename Category" : "New Category"}
           </DialogTitle>
           <DialogDescription>
             {category
-              ? "Ändern Sie den Namen der Kategorie"
-              : "Erstellen Sie eine neue Kategorie für Ihre Dokumente"}
+              ? "Change the category name"
+              : "Create a new category for your documents"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Kategoriename</Label>
+            <Label htmlFor="name">Category Name</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="z.B. Hygiene, Personal, Formulare"
+              placeholder="e.g. Hygiene, Personnel, Forms"
               disabled={loading}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -106,16 +105,16 @@ export function CategoryDialog({ open, onClose, category }: CategoryDialogProps)
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={loading}>
-            Abbrechen
+            Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={loading || !name.trim()}>
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Speichern...
+                Saving...
               </>
             ) : (
-              "Speichern"
+              "Save"
             )}
           </Button>
         </div>

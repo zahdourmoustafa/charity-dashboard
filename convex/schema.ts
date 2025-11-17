@@ -4,8 +4,7 @@ import { v } from "convex/values";
 export default defineSchema({
   // Categories for organizing documents
   categories: defineTable({
-    name: v.string(),              // Internal name (English)
-    nameGerman: v.string(),        // Display name (German)
+    name: v.string(),              // Display name
     description: v.string(),       // Category description
     icon: v.optional(v.string()), // Icon name (lucide-react)
     order: v.number(),             // Display order

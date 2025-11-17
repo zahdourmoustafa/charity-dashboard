@@ -73,7 +73,7 @@ export function SourcePreviewSidebar({ isOpen, onClose, source }: SourcePreviewS
             <div className="flex items-center justify-between">
               <SheetTitle className="text-left">
                 {source.title}
-                {source.pageNumber && ` - Seite ${source.pageNumber}`}
+                {source.pageNumber && ` - Page ${source.pageNumber}`}
               </SheetTitle>
               <div className="flex gap-2 items-center">
                 <ZoomOut />
@@ -104,7 +104,7 @@ export function SourcePreviewSidebar({ isOpen, onClose, source }: SourcePreviewS
 
           <div className="border-t p-4 bg-muted/50 max-h-[200px] overflow-y-auto">
             <p className="text-xs font-semibold text-muted-foreground mb-2">
-              📝 Relevanter Abschnitt:
+              📝 Relevant Section:
             </p>
             <Card className="p-3">
               <p className="text-sm whitespace-pre-wrap">{source.chunkText}</p>

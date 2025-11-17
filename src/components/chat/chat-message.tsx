@@ -40,7 +40,7 @@ export function ChatMessage({ role, content, sources, onSourceClick }: ChatMessa
 
         {sources && sources.length > 0 && (
           <div className="flex flex-col gap-1">
-            <p className="text-xs text-muted-foreground">Quellen:</p>
+            <p className="text-xs text-muted-foreground">Sources:</p>
             <div className="flex flex-wrap gap-2">
               {sources.map((source, index) => (
                 <Button
